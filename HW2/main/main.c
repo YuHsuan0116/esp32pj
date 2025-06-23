@@ -14,21 +14,20 @@ static SemaphoreHandle_t pos_mutex;
 
 void Multiplication(void* arg) {
     while(1) {
-        if(xSemaphoreTake(pos_mutex, 1000) == pdTRUE) {
-            if(pos >= N * N) {
-                xSemaphoreGive(pos_mutex);
-                break;
-            }
-            int row = pos / N;
-            int col = pos % N;
-            int core_id = esp_cpu_get_core_id();
-            printf("Task %s is calculating M3[%d][%d] on Core%d\n", pcTaskGetName(NULL), row, col, core_id);
-            for(int i = 0; i < N; i++) {
-                M3[row][col] += M1[row][i] * M2[i][col];
-            }
-            pos++;
+        xSemaphoreTake(pos_mutex, 1000);
+        if(pos >= N * N) {
             xSemaphoreGive(pos_mutex);
+            break;
         }
+        int row = pos / N;
+        int col = pos % N;
+        int core_id = esp_cpu_get_core_id();
+        printf("Task %s is calculating M3[%d][%d] on Core%d\n", pcTaskGetName(NULL), row, col, core_id);
+        for(int i = 0; i < N; i++) {
+            M3[row][col] += M1[row][i] * M2[i][col];
+        }
+        pos++;
+        xSemaphoreGive(pos_mutex);
     }
     vTaskDelete(NULL);
 }
@@ -55,16 +54,16 @@ void Summation(void* arg) {
 void app_main(void) {
     pos_mutex = xSemaphoreCreateMutex();
     // create Multiplication tasks
-    xTaskCreate(Multiplication, "multiplication_task0", 2048, NULL, 1, NULL);
-    xTaskCreate(Multiplication, "multiplication_task1", 2048, NULL, 1, NULL);
+    xTaskCreate(Multiplication, "multiplication0", 2048, NULL, 1, NULL);
+    xTaskCreate(Multiplication, "multiplication1", 2048, NULL, 1, NULL);
 
     // delay
-    vTaskDelay(pdMS_TO_TICKS(500));
+    vTaskDelay(pdMS_TO_TICKS(1000));
     pos = 0;
 
     // create Summation tasks
-    xTaskCreate(Summation, "summation_task0", 2048, NULL, 1, NULL);
-    xTaskCreate(Summation, "summation_task1", 2048, NULL, 1, NULL);
+    xTaskCreate(Summation, "summation0", 2048, NULL, 1, NULL);
+    xTaskCreate(Summation, "summation1", 2048, NULL, 1, NULL);
 
     // print M3 and sum
     printf("M3: \n");
