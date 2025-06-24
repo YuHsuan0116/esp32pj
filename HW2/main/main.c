@@ -7,10 +7,10 @@
 
 static int M1[N][N] = {{2, 0, 0, 6}, {0, 1, 1, 6}, {1, 3, 9, 0}, {1, 0, 3, 6}};
 static int M2[N][N] = {{6, 0, 0, 2}, {6, 1, 1, 0}, {0, 9, 3, 1}, {6, 3, 0, 1}};
-static int M3[N][N] = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
+static int M3[N][N];
 
 static int l_idx, r_idx, sum = 0;
-static SemaphoreHandle_t l_idx_mutex, r_idx_mutex;
+static SemaphoreHandle_t idx_mutex, sum_mutex;
 
 void ResetIndex() {
     l_idx = 0;
@@ -20,10 +20,9 @@ void ResetIndex() {
 void Mult_task(void* arg) {
     int core_id = esp_cpu_get_core_id();
     while(1) {
-        if(xSemaphoreTake(l_idx_mutex, portMAX_DELAY) == pdTRUE && xSemaphoreTake(r_idx_mutex, portMAX_DELAY) == pdTRUE) {
+        if(xSemaphoreTake(idx_mutex, portMAX_DELAY) == pdTRUE) {
             if(l_idx > r_idx) {
-                xSemaphoreGive(l_idx_mutex);
-                xSemaphoreGive(r_idx_mutex);
+                xSemaphoreGive(idx_mutex);
                 break;
             }
             int idx;
@@ -32,15 +31,14 @@ void Mult_task(void* arg) {
             } else {
                 idx = r_idx--;
             }
-            xSemaphoreGive(l_idx_mutex);
-            xSemaphoreGive(r_idx_mutex);
+            xSemaphoreGive(idx_mutex);
             int row = idx / N, col = idx % N;
-            int local_value = 0;
+            int val = 0;
             printf("Task %s is processing M3[%d][%d] on Core%d\n", pcTaskGetName(NULL), row, col, core_id);
             for(int i = 0; i < N; i++) {
-                local_value += M1[row][i] * M2[i][col];
+                val += M1[row][i] * M2[i][col];
             }
-            M3[row][col] = local_value;
+            M3[row][col] = val;
         }
     }
     vTaskDelete(NULL);
@@ -50,10 +48,9 @@ void Sum_task(void* arg) {
     int core_id = esp_cpu_get_core_id();
     int local_sum = 0;
     while(1) {
-        if(xSemaphoreTake(l_idx_mutex, portMAX_DELAY) == pdTRUE && xSemaphoreTake(r_idx_mutex, portMAX_DELAY) == pdTRUE) {
+        if(xSemaphoreTake(idx_mutex, portMAX_DELAY) == pdTRUE) {
             if(l_idx > r_idx) {
-                xSemaphoreGive(l_idx_mutex);
-                xSemaphoreGive(r_idx_mutex);
+                xSemaphoreGive(idx_mutex);
                 break;
             }
             int idx;
@@ -62,21 +59,23 @@ void Sum_task(void* arg) {
             } else {
                 idx = r_idx--;
             }
-            xSemaphoreGive(l_idx_mutex);
-            xSemaphoreGive(r_idx_mutex);
+            xSemaphoreGive(idx_mutex);
             int row = idx / N, col = idx % N;
             printf("Task %s is processing M3[%d][%d] on Core%d\n", pcTaskGetName(NULL), row, col, core_id);
             local_sum += M3[row][col];
         }
     }
-    sum += local_sum;
+    if(xSemaphoreTake(sum_mutex, portMAX_DELAY) == pdTRUE) {
+        sum += local_sum;
+        xSemaphoreGive(sum_mutex);
+    }
     vTaskDelete(NULL);
 }
 
 void app_main(void) {
     // setup
-    l_idx_mutex = xSemaphoreCreateMutex();
-    r_idx_mutex = xSemaphoreCreateMutex();
+    idx_mutex = xSemaphoreCreateMutex();
+    sum_mutex = xSemaphoreCreateMutex();
 
     // create Multiplication tasks
     ResetIndex();
