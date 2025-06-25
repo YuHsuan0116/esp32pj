@@ -9,8 +9,8 @@ static int M1[N][N] = {{2, 0, 0, 6}, {0, 1, 1, 6}, {1, 3, 9, 0}, {1, 0, 3, 6}};
 static int M2[N][N] = {{6, 0, 0, 2}, {6, 1, 1, 0}, {0, 9, 3, 1}, {6, 3, 0, 1}};
 static int M3[N][N];
 
-static int idx = 0, sum = 0, finished_tasks = 0;
-static SemaphoreHandle_t idx_mutex, sum_mutex, finished_tasks_mutex;
+static int idx = 0, sum = 0;
+static SemaphoreHandle_t idx_mutex, sum_mutex, finished_tasks_sem;
 
 void task(void* arg) {
     int core_id = esp_cpu_get_core_id();
@@ -36,10 +36,7 @@ void task(void* arg) {
             }
         }
     }
-    if(xSemaphoreTake(finished_tasks_mutex, portMAX_DELAY) == pdTRUE) {
-        finished_tasks++;
-        xSemaphoreGive(finished_tasks_mutex);
-    }
+    xSemaphoreGive(finished_tasks_sem);
     vTaskDelete(NULL);
 }
 
@@ -47,14 +44,14 @@ void app_main(void) {
     // setup
     idx_mutex = xSemaphoreCreateMutex();
     sum_mutex = xSemaphoreCreateMutex();
-    finished_tasks_mutex = xSemaphoreCreateMutex();
+    finished_tasks_sem = xSemaphoreCreateCounting(2, 0);
 
     // create Multiplication tasks
     xTaskCreate(task, "task0", 2048, NULL, 1, NULL);
     xTaskCreate(task, "task1", 2048, NULL, 1, NULL);
 
-    while(finished_tasks != 2) {
-        vTaskDelay(pdMS_TO_TICKS(10));
+    for(int i = 0; i < 2; i++) {
+        xSemaphoreTake(finished_tasks_sem, portMAX_DELAY);
     }
 
     // print M3 and sum
