@@ -9,10 +9,10 @@
 #define VX_INIT 1
 #define VY_INIT -1
 #define X_INIT 1
-#define Y_INIT 1
-#define X_END 4
-#define Y_END 0
-#define FPS 2
+#define Y_INIT 7
+#define X_END 7
+#define Y_END 7
+#define FPS 5
 #define N 8
 
 #define MOSI 23
@@ -69,7 +69,7 @@ void max7219_init() {
         .quadhd_io_num = -1,
     };
     spi_device_interface_config_t devcfg = {
-        .clock_speed_hz = 1 * 1000 * 1000,
+        .clock_speed_hz = 0.1 * 1000 * 1000,
         .spics_io_num = CS,
         .queue_size = 7,
     };
@@ -138,10 +138,23 @@ void app_main(void) {
     frame_semaphore = xSemaphoreCreateBinary();
     max7219_init();
 
-    // Show initial frame
+    // blink start point
     led_matrix[Y_INIT][X_INIT] = 1;
     update_frame();
-    vTaskDelay(pdMS_TO_TICKS(1000));  // Wait before starting animation
+    vTaskDelay(pdMS_TO_TICKS(1000));
+    led_matrix[Y_INIT][X_INIT] = 0;
+    update_frame();
+    vTaskDelay(pdMS_TO_TICKS(1000));
+
+    // blink end point
+    led_matrix[Y_END][X_END] = 1;
+    update_frame();
+    vTaskDelay(pdMS_TO_TICKS(1000));
+    led_matrix[Y_END][X_END] = 0;
+    update_frame();
+    vTaskDelay(pdMS_TO_TICKS(1000));
+
+    led_matrix[Y_INIT][X_INIT] = 1;
 
     // Create periodic timer
     const esp_timer_create_args_t periodic_timer_args = {.callback = &periodic_timer_callback, .name = "frame_timer"};
@@ -149,6 +162,7 @@ void app_main(void) {
     esp_timer_create(&periodic_timer_args, &periodic_timer);
     esp_timer_start_periodic(periodic_timer, TIMER_INTERVAL);
 
+    // start
     while(1) {
         if(xSemaphoreTake(frame_semaphore, portMAX_DELAY)) {
             update_frame();
