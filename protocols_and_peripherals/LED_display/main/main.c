@@ -1,18 +1,17 @@
 #include <stdio.h>
 #include <string.h>
-#include "driver/gpio.h"
 #include "driver/spi_master.h"
 #include "esp_timer.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 
 #define VX_INIT 1
-#define VY_INIT 1
-#define X_INIT 2
+#define VY_INIT -1
+#define X_INIT 1
 #define Y_INIT 1
-#define X_END 7
+#define X_END 3
 #define Y_END 5
-#define FPS 1
+#define FPS 2
 #define N 8
 
 #define MOSI 23
@@ -34,7 +33,8 @@ static int vx = VX_INIT;
 static int vy = VY_INIT;
 static int x = X_INIT;
 static int y = Y_INIT;
-static int TIMER_INTERVAL = 1000000 / FPS;
+static int frame_count = 0;
+static int TIMER_INTERVAL = (int)(1000000.0 / FPS);
 
 static SemaphoreHandle_t frame_semaphore;
 static spi_device_handle_t spi;
@@ -82,6 +82,9 @@ void max7219_init() {
 
 // TODO
 static void update_frame() {
+    for(uint8_t i = 1; i <= 8; i++) {
+        max7219_send(i, 0x00);
+    }
     printf("----------------\n");
     for(uint8_t row = 0; row < 8; row++) {
         uint8_t value = 0;
@@ -100,12 +103,12 @@ static void update_frame() {
     printf("----------------\n");
 }
 static void calculate_next_frame() {
-    led_matrix[x][y] = 0;
+    led_matrix[y][x] = 0;
     x += vx;
     y += vy;
-    vx = (x >= N - 1) ? -1 : (x <= 0 ? 1 : vx);
-    vy = (y >= N - 1) ? -1 : (y <= 1 ? 1 : vy);
-    led_matrix[x][y] = 1;
+    vx = (x == N - 1) ? -1 : (x == 1 ? 1 : vx);
+    vy = (y == N - 1) ? -1 : (y == 0 ? 1 : vy);
+    led_matrix[y][x] = 1;
     if(x == X_END && y == Y_END) {
         finished = true;
     }
@@ -114,6 +117,9 @@ static void calculate_next_frame() {
 void app_main(void) {
     frame_semaphore = xSemaphoreCreateBinary();
     max7219_init();
+    led_matrix[Y_INIT][X_INIT] = 1;
+    update_frame();
+    vTaskDelay(pdMS_TO_TICKS(1000));
 
     const esp_timer_create_args_t periodic_timer_args = {.callback = &periodic_timer_callback, .name = "frame_timer"};
 
@@ -124,6 +130,7 @@ void app_main(void) {
     while(1) {
         if(xSemaphoreTake(frame_semaphore, portMAX_DELAY)) {
             update_frame();
+            frame_count++;
             if(finished) {
                 break;
             }
@@ -131,4 +138,12 @@ void app_main(void) {
             printf("Frame update at %lld ms\n", esp_timer_get_time() / 1000);
         }
     }
+    printf("frame count: %d\n", frame_count);
+
+    vTaskDelay(pdMS_TO_TICKS(2000));
+
+    for(uint8_t i = 1; i <= 8; i++) {
+        max7219_send(i, 0x00);
+    }
+    printf("--------------end--------------\n");
 }
