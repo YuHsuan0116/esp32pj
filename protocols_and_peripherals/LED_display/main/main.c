@@ -8,11 +8,11 @@
 // Config for initial velocity, initial position, end position, FPS, and matrix size
 #define VX_INIT 1
 #define VY_INIT -1
-#define X_INIT 1
-#define Y_INIT 7
-#define X_END 7
-#define Y_END 7
-#define FPS 5
+#define X_INIT 2
+#define Y_INIT 6
+#define X_END 1
+#define Y_END 6
+#define FPS 30
 #define N 8
 
 #define MOSI 23
@@ -69,7 +69,7 @@ void max7219_init() {
         .quadhd_io_num = -1,
     };
     spi_device_interface_config_t devcfg = {
-        .clock_speed_hz = 0.1 * 1000 * 1000,
+        .clock_speed_hz = 1 * 1000 * 1000,
         .spics_io_num = CS,
         .queue_size = 7,
     };
