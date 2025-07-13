@@ -8,8 +8,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/YuHsuan/Desktop/esp32pj/HW2/main",
-      "program": "c:/Users/YuHsuan/Desktop/esp32pj/HW2/main/build/Debug/outDebug",
+      "cwd": "c:/Users/YuHsuanPC/Desktop/esp32pj/HW2/main",
+      "program": "c:/Users/YuHsuanPC/Desktop/esp32pj/HW2/main/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
