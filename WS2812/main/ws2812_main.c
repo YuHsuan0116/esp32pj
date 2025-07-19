@@ -39,6 +39,6 @@ void app_main(void) {
     for(int frame = 0; frame < FRAME_NUMBER; frame++) {
         ESP_ERROR_CHECK(rmt_transmit(tx_chan, ws2812_encoder, ws2812_pixels[frame], sizeof(ws2812_pixels[frame]), &tx_config));
         ESP_ERROR_CHECK(rmt_tx_wait_all_done(tx_chan, portMAX_DELAY));
-        vTaskDelay(pdMS_TO_TICKS(100));
+        vTaskDelay(pdMS_TO_TICKS(40));
     }
 }

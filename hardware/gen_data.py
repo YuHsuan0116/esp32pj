@@ -2,16 +2,15 @@ import colorsys
 
 FRAME_NUMBER = 1000
 LED_NUMBER = 8
-COLOR_COUNT = 30
-INTENSITY_MAX = 63
+COLOR_COUNT = 200
 
 rainbow_table = []
 for i in range(COLOR_COUNT):
     hue = i / COLOR_COUNT
     r, g, b = colorsys.hsv_to_rgb(hue, 1.0, 1.0)
-    r = int(r * INTENSITY_MAX)
-    g = int(g * INTENSITY_MAX)
-    b = int(b * INTENSITY_MAX)
+    r = int(r * 63)
+    g = int(g * 63)
+    b = int(b * 63)
     rainbow_table.append([r, g, b])
 
 frames = []
