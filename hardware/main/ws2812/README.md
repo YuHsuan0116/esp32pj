@@ -57,7 +57,7 @@ new_ws2812(GPIO_NUM_5, 8, &encoder, &strip);  // 8 LEDs on GPIO5
 
 ```c
 uint8_t data[8][3] = {
-    {0x10, 0x00, 0x00},  // Green, Red, Blue for LED 0
+    {0x10, 0x00, 0x00},  // Red, Green, Blue for LED 0
     {0x00, 0x10, 0x00},  // LED 1
     ...
 };
