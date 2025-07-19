@@ -98,11 +98,12 @@ esp_err_t new_ws2812_encoder(rmt_encoder_handle_t* ret_encoder) {
     return ESP_OK;
 }
 
-esp_err_t new_ws2812(int LED_GPIO_PIN, int _LED_NUM, ws2812_handle_t* ret_ws2812) {
+esp_err_t new_ws2812(int _gpio_num, int _LED_NUM, rmt_encoder_handle_t* _encoder, ws2812_handle_t* ret_ws2812) {
     ret_ws2812->channel = NULL;
+    ret_ws2812->encoder = _encoder;
     rmt_tx_channel_config_t tx_chan_config = {
         .clk_src = RMT_CLK_SRC_DEFAULT,
-        .gpio_num = LED_GPIO_PIN,
+        .gpio_num = _gpio_num,
         .mem_block_symbols = 64,
         .resolution_hz = WS2812_RESOLUTION,
         .trans_queue_depth = 1,
@@ -116,8 +117,14 @@ esp_err_t new_ws2812(int LED_GPIO_PIN, int _LED_NUM, ws2812_handle_t* ret_ws2812
 static rmt_transmit_config_t tx_config = {
     .loop_count = 0,
 };
-esp_err_t display(uint8_t* data, ws2812_handle_t ws2812, rmt_encoder_handle_t ws2812_encoder) {
-    rmt_transmit(ws2812.channel, ws2812_encoder, data, ws2812.LED_NUM * 3, &tx_config);
+esp_err_t display(uint8_t data[][3], ws2812_handle_t ws2812) {
+    uint8_t buffer[1024 * 3] = {};
+    for(int led_idx = 0; led_idx < ws2812.LED_NUM; led_idx++) {
+        buffer[led_idx * 3] = data[led_idx][1];
+        buffer[led_idx * 3 + 1] = data[led_idx][0];
+        buffer[led_idx * 3 + 2] = data[led_idx][2];
+    }
+    rmt_transmit(ws2812.channel, *(ws2812.encoder), buffer, ws2812.LED_NUM * 3, &tx_config);
     rmt_tx_wait_all_done(ws2812.channel, portMAX_DELAY);
     return ESP_OK;
 }

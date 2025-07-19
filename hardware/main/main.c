@@ -12,18 +12,18 @@
 static const char* TAG = "ws2812_main";
 
 void app_main(void) {
-    ws2812_handle_t ws2812[CHANNELS_NUMBER];
-    int gpio_nums[CHANNELS_NUMBER] = {5, 19};
-    int led_nums[CHANNELS_NUMBER] = {8, 8};
-    for(int i = 0; i < CHANNELS_NUMBER; i++) {
-        ESP_ERROR_CHECK(new_ws2812(gpio_nums[i], led_nums[i], &ws2812[i]));
-    }
-
     rmt_encoder_handle_t ws2812_encoder;
     new_ws2812_encoder(&ws2812_encoder);
 
+    ws2812_handle_t ws2812[CHANNELS_NUMBER];
+    int gpio_num[CHANNELS_NUMBER] = {5, 19};
+    int led_num[CHANNELS_NUMBER] = {8, 8};
+    for(int i = 0; i < CHANNELS_NUMBER; i++) {
+        ESP_ERROR_CHECK(new_ws2812(gpio_num[i], led_num[i], &ws2812_encoder, &ws2812[i]));
+    }
+
     for(int frame = 0; frame < FRAME_NUMBER; frame++) {
-        display(ws2812_pixels[frame], ws2812[0], ws2812_encoder);
+        display(ws2812_pixels[frame], ws2812[0]);
         vTaskDelay(pdMS_TO_TICKS(10));
     }
 }
