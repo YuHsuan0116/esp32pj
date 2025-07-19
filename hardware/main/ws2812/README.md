@@ -6,7 +6,7 @@ This module provides a driver for controlling WS2812 RGB LED strips using the ES
 
 - Supports arbitrary number of WS2812 LEDs
 - RMT-based waveform generation with precise timing
-- Encodes data in GRB format, MSB-first
+- Encodes data in RGB format, MSB-first
 - Supports reset signal timing for proper latching
 - Designed for use with ESP-IDF (v4.3+)
 
