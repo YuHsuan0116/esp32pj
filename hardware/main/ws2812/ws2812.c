@@ -1,4 +1,4 @@
-#include "../inc/ws2812.h"
+#include "ws2812.h"
 #include "esp_check.h"
 #include "esp_log.h"
 #include "freertos/FreeRTOS.h"

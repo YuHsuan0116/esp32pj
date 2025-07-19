@@ -4,7 +4,7 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
 #include "led_table.c"
-#include "ws2812.h"
+#include "ws2812/ws2812.h"
 
 #define CHANNELS_NUMBER 2
 #define WS2812_RESOLUTION 10000000
