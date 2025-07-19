@@ -7,6 +7,18 @@
 #define WS2812_RESOLUTION 10000000
 static const char* TAG = "ws2812.c";
 
+typedef struct {
+    uint32_t resolution;
+} ws2812_encoder_config_t;
+
+typedef struct {
+    rmt_encoder_t base;
+    rmt_encoder_t* bytes_encoder;
+    rmt_encoder_t* copy_encoder;
+    int state;
+    rmt_symbol_word_t reset_code;
+} ws2812_encoder_t;
+
 size_t encode_ws2812(rmt_encoder_t* encoder, rmt_channel_handle_t channel, const void* data, size_t data_size, rmt_encode_state_t* ret_state) {
     ws2812_encoder_t* ws2812_encoder = __containerof(encoder, ws2812_encoder_t, base);
     rmt_encoder_handle_t bytes_encoder = ws2812_encoder->bytes_encoder;

@@ -1,14 +1,7 @@
 # WS2812 LED Strip Driver
 
-This module provides a driver for controlling WS2812 RGB LED strips using the ESP32 RMT peripheral and a software-based GRB encoder.
+This module provides a driver for controlling WS2812 RGB LED strips using the ESP32 RMT peripheral and a software-based RGB encoder.
 
-## Features
-
-- Supports arbitrary number of WS2812 LEDs
-- RMT-based waveform generation with precise timing
-- Encodes data in RGB format, MSB-first
-- Supports reset signal timing for proper latching
-- Designed for use with ESP-IDF (v4.3+)
 
 ## File Structure
 
@@ -18,18 +11,6 @@ ws2812/
 ├── ws2812.c             # Implementation
 └── README.md            # This documentation
 ```
-
-## Data Format
-
-Each LED accepts **24 bits** of color data in the order:
-
-```
-[G7:G0] [R7:R0] [B7:B0]
-```
-
-Data is sent **MSB-first** over a single GPIO pin using RMT. A **reset code** (low for >50µs) is required at the end.
-
----
 
 ## API Usage
 
@@ -86,7 +67,6 @@ Displays GRB data on the specified LED strip.
 
 - Data must be sent in **RGB** order.
 - Each LED update takes ~1.25 µs; a full strip of 300 LEDs takes ~375 µs + 50 µs reset.
-- Be sure to allocate enough memory blocks in RMT to hold full frame data.
 
 ---
 
