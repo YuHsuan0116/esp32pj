@@ -55,11 +55,7 @@ Displays GRB data on the specified LED strip.
 ## Notes
 
 - Data must be sent in **RGB** order.
-<<<<<<< HEAD
-- Each LED update takes ~1.25 µs; a full strip of 300 LEDs takes ~375 µs + 50 µs reset.
-=======
 - Each LED update takes 30 µs; a full strip of 100 LEDs takes 3 ms + 50 µs reset.
->>>>>>> d9a43a9 (07201745)
 
 ---
 
