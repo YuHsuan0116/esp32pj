@@ -20,13 +20,6 @@ ws2812/
 #include "ws2812.h"
 ```
 
-### Create Encoder
-
-```c
-rmt_encoder_handle_t encoder;
-new_ws2812_encoder(&encoder);
-```
-
 ### Initialize WS2812 Strip
 
 ```c
@@ -49,10 +42,6 @@ display(data, strip);
 
 ## Function Reference
 
-### `esp_err_t new_ws2812_encoder(rmt_encoder_handle_t* ret_encoder)`
-
-Creates an encoder instance suitable for WS2812 timing.
-
 ### `esp_err_t new_ws2812(int gpio_num, int led_num, rmt_encoder_handle_t* encoder, ws2812_handle_t* ret_ws2812)`
 
 Initializes a WS2812 LED strip on the specified GPIO pin.
@@ -66,7 +55,11 @@ Displays GRB data on the specified LED strip.
 ## Notes
 
 - Data must be sent in **RGB** order.
+<<<<<<< HEAD
 - Each LED update takes ~1.25 µs; a full strip of 300 LEDs takes ~375 µs + 50 µs reset.
+=======
+- Each LED update takes 30 µs; a full strip of 100 LEDs takes 3 ms + 50 µs reset.
+>>>>>>> d9a43a9 (07201745)
 
 ---
 
