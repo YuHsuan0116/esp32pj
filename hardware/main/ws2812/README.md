@@ -24,7 +24,7 @@ ws2812/
 
 ```c
 ws2812_handle_t strip;
-new_ws2812(GPIO_NUM_5, 8, &encoder, &strip);  // 8 LEDs on GPIO5
+new_ws2812(GPIO_NUM_5, 8, &strip);  // 8 LEDs on GPIO5
 ```
 
 ### Send Color Data
@@ -42,7 +42,7 @@ display(data, strip);
 
 ## Function Reference
 
-### `esp_err_t new_ws2812(int gpio_num, int led_num, rmt_encoder_handle_t* encoder, ws2812_handle_t* ret_ws2812)`
+### `esp_err_t new_ws2812(int gpio_num, int led_num, ws2812_handle_t* ret_ws2812)`
 
 Initializes a WS2812 LED strip on the specified GPIO pin.
 
