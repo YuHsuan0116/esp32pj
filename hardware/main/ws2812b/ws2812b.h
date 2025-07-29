@@ -1,6 +1,11 @@
 #pragma once
 
-#include "../config.h"
+#include <stdint.h>
+#include <string.h>
+#include "driver/rmt_encoder.h"
+#include "driver/rmt_tx.h"
+#include "esp_check.h"
+#include "esp_log.h"
 
 typedef struct {
     int LED_NUM;

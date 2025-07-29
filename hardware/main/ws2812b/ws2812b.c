@@ -1,5 +1,5 @@
 #include "ws2812b.h"
-
+#define WS2812B_RESOLUTION 10000000
 static const char* TAG = "ws2812.c";
 
 typedef struct {
