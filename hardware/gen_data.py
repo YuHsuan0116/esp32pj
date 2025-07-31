@@ -1,6 +1,6 @@
 import colorsys
 
-FRAME_NUMBER = 500
+FRAME_NUMBER = 100
 LED_NUMBER = 8     # 每個 channel 有 8 顆 LED
 CHANNEL_NUMBER = 8   # 兩個 channel
 COLOR_COUNT = 49
@@ -32,7 +32,7 @@ black_frame = [[[0, 0, 0] for _ in range(LED_NUMBER)] for _ in range(CHANNEL_NUM
 frames.append(black_frame)
 
 # 輸出 C 檔案
-with open(r"main/led_table.c", "w") as f:
+with open(r"main/led_table.h", "w") as f:
     f.write("#include <stdint.h>\n")
     f.write(f"#define FRAME_NUMBER {FRAME_NUMBER}\n")
     f.write(f"#define CHANNEL_NUMBER {CHANNEL_NUMBER}\n")

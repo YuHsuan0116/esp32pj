@@ -1,4 +1,5 @@
 #include "ws2812b.h"
+#include "esp_timer.h"
 #define WS2812B_RESOLUTION 10000000
 static const char* TAG = "ws2812.c";
 
@@ -118,6 +119,19 @@ esp_err_t new_ws2812b(int _gpio_num, int _LED_NUM, ws2812b_handle_t* ret_ws2812b
     ESP_RETURN_ON_ERROR(rmt_new_tx_channel(&tx_chan_config, &ret_ws2812b->channel), TAG, "new_tx_channel failed");
     ESP_RETURN_ON_ERROR(rmt_enable(ret_ws2812b->channel), TAG, "enable failed");
     ret_ws2812b->LED_NUM = _LED_NUM;
+    return ESP_OK;
+}
+
+esp_err_t new_ws2812b_channel(int _gpio, rmt_channel_handle_t* channel) {
+    rmt_tx_channel_config_t tx_chan_config = {
+        .clk_src = RMT_CLK_SRC_DEFAULT,
+        .gpio_num = _gpio,
+        .mem_block_symbols = 64,
+        .resolution_hz = WS2812B_RESOLUTION,
+        .trans_queue_depth = 1,
+    };
+    ESP_RETURN_ON_ERROR(rmt_new_tx_channel(&tx_chan_config, channel), TAG, "new_tx_channel failed");
+    ESP_RETURN_ON_ERROR(rmt_enable(*channel), TAG, "enable failed");
     return ESP_OK;
 }
 
