@@ -106,21 +106,21 @@ esp_err_t new_ws2812b_encoder(rmt_encoder_handle_t* ret_encoder) {
     return ESP_OK;
 }
 
-esp_err_t new_ws2812b(int _gpio_num, int _LED_NUM, ws2812b_handle_t* ret_ws2812b) {
-    ret_ws2812b->channel = NULL;
-    new_ws2812b_encoder(&(ret_ws2812b->encoder));
-    rmt_tx_channel_config_t tx_chan_config = {
-        .clk_src = RMT_CLK_SRC_DEFAULT,
-        .gpio_num = _gpio_num,
-        .mem_block_symbols = 64,
-        .resolution_hz = WS2812B_RESOLUTION,
-        .trans_queue_depth = 1,
-    };
-    ESP_RETURN_ON_ERROR(rmt_new_tx_channel(&tx_chan_config, &ret_ws2812b->channel), TAG, "new_tx_channel failed");
-    ESP_RETURN_ON_ERROR(rmt_enable(ret_ws2812b->channel), TAG, "enable failed");
-    ret_ws2812b->LED_NUM = _LED_NUM;
-    return ESP_OK;
-}
+// esp_err_t new_ws2812b(int _gpio_num, int _LED_NUM, ws2812b_handle_t* ret_ws2812b) {
+//     ret_ws2812b->channel = NULL;
+//     new_ws2812b_encoder(&(ret_ws2812b->encoder));
+//     rmt_tx_channel_config_t tx_chan_config = {
+//         .clk_src = RMT_CLK_SRC_DEFAULT,
+//         .gpio_num = _gpio_num,
+//         .mem_block_symbols = 64,
+//         .resolution_hz = WS2812B_RESOLUTION,
+//         .trans_queue_depth = 1,
+//     };
+//     ESP_RETURN_ON_ERROR(rmt_new_tx_channel(&tx_chan_config, &ret_ws2812b->channel), TAG, "new_tx_channel failed");
+//     ESP_RETURN_ON_ERROR(rmt_enable(ret_ws2812b->channel), TAG, "enable failed");
+//     ret_ws2812b->LED_NUM = _LED_NUM;
+//     return ESP_OK;
+// }
 
 esp_err_t new_ws2812b_channel(int _gpio, rmt_channel_handle_t* channel) {
     rmt_tx_channel_config_t tx_chan_config = {
@@ -135,11 +135,11 @@ esp_err_t new_ws2812b_channel(int _gpio, rmt_channel_handle_t* channel) {
     return ESP_OK;
 }
 
-static rmt_transmit_config_t tx_config = {
-    .loop_count = 0,
-};
-esp_err_t ws2812b_write(uint8_t data[][3], ws2812b_handle_t ws2812b) {
-    rmt_transmit(ws2812b.channel, ws2812b.encoder, data, ws2812b.LED_NUM * 3, &tx_config);
-    // rmt_tx_wait_all_done(ws2812.channel, portMAX_DELAY);
-    return ESP_OK;
-}
+// static rmt_transmit_config_t tx_config = {
+//     .loop_count = 0,
+// };
+// esp_err_t ws2812b_write(uint8_t data[][3], ws2812b_handle_t ws2812b) {
+//     rmt_transmit(ws2812b.channel, ws2812b.encoder, data, ws2812b.LED_NUM * 3, &tx_config);
+//     // rmt_tx_wait_all_done(ws2812.channel, portMAX_DELAY);
+//     return ESP_OK;
+// }
