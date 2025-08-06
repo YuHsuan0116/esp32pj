@@ -1,6 +1,10 @@
 #pragma once
 #include <stdint.h>
 
+#define I2C_MASTER_SCL_IO 22
+#define I2C_MASTER_SDA_IO 21
+#define IREFALL 0x45
+
 const static uint8_t PWM_addr[15] = {
     0x08,
     0x09,
