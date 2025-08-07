@@ -15,6 +15,40 @@ typedef struct {
     rmt_symbol_word_t reset_code;
 } ws2812b_encoder_t;
 
+// size_t encode_ws2812b(rmt_encoder_t* encoder, rmt_channel_handle_t channel, const void* data, size_t data_size, rmt_encode_state_t* ret_state) {
+//     ws2812b_encoder_t* ws2812b_encoder = __containerof(encoder, ws2812b_encoder_t, base);
+//     rmt_encoder_handle_t bytes_encoder = ws2812b_encoder->bytes_encoder;
+//     rmt_encoder_handle_t copy_encoder = ws2812b_encoder->copy_encoder;
+//     rmt_encode_state_t session_state = RMT_ENCODING_RESET;
+//     rmt_encode_state_t state = RMT_ENCODING_RESET;
+//     size_t encoded_symbols = 0;
+//     switch(ws2812b_encoder->state) {
+//         case 0:  // send RGB data
+//             encoded_symbols += bytes_encoder->encode(bytes_encoder, channel, data, data_size, &session_state);
+//             if(session_state & RMT_ENCODING_COMPLETE) {
+//                 ws2812b_encoder->state = 1;
+//             }
+//             if(session_state & RMT_ENCODING_MEM_FULL) {
+//                 state |= RMT_ENCODING_MEM_FULL;
+//                 goto out;
+//             }
+//         case 1:  // send reset code
+//             encoded_symbols +=
+//                 copy_encoder->encode(copy_encoder, channel, &ws2812b_encoder->reset_code, sizeof(ws2812b_encoder->reset_code), &session_state);
+//             if(session_state & RMT_ENCODING_COMPLETE) {
+//                 ws2812b_encoder->state = RMT_ENCODING_RESET;
+//                 state |= RMT_ENCODING_COMPLETE;
+//             }
+//             if(session_state & RMT_ENCODING_MEM_FULL) {
+//                 state |= RMT_ENCODING_MEM_FULL;
+//                 goto out;
+//             }
+//     }
+// out:
+//     *ret_state = state;
+//     return encoded_symbols;
+// }
+
 size_t encode_ws2812b(rmt_encoder_t* encoder, rmt_channel_handle_t channel, const void* data, size_t data_size, rmt_encode_state_t* ret_state) {
     ws2812b_encoder_t* ws2812b_encoder = __containerof(encoder, ws2812b_encoder_t, base);
     rmt_encoder_handle_t bytes_encoder = ws2812b_encoder->bytes_encoder;
@@ -22,6 +56,7 @@ size_t encode_ws2812b(rmt_encoder_t* encoder, rmt_channel_handle_t channel, cons
     rmt_encode_state_t session_state = RMT_ENCODING_RESET;
     rmt_encode_state_t state = RMT_ENCODING_RESET;
     size_t encoded_symbols = 0;
+    bool end_flag = false;
     switch(ws2812b_encoder->state) {
         case 0:  // send RGB data
             encoded_symbols += bytes_encoder->encode(bytes_encoder, channel, data, data_size, &session_state);
@@ -30,8 +65,9 @@ size_t encode_ws2812b(rmt_encoder_t* encoder, rmt_channel_handle_t channel, cons
             }
             if(session_state & RMT_ENCODING_MEM_FULL) {
                 state |= RMT_ENCODING_MEM_FULL;
-                goto out;
+                break;
             }
+        // fall-through
         case 1:  // send reset code
             encoded_symbols +=
                 copy_encoder->encode(copy_encoder, channel, &ws2812b_encoder->reset_code, sizeof(ws2812b_encoder->reset_code), &session_state);
@@ -41,10 +77,8 @@ size_t encode_ws2812b(rmt_encoder_t* encoder, rmt_channel_handle_t channel, cons
             }
             if(session_state & RMT_ENCODING_MEM_FULL) {
                 state |= RMT_ENCODING_MEM_FULL;
-                goto out;
             }
     }
-out:
     *ret_state = state;
     return encoded_symbols;
 }

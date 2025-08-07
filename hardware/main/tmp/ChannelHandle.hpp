@@ -23,6 +23,7 @@ class Channel_Handle {
         } else {
             pca_channel = config.pca_channel;
             addr = config.gpio_or_addr;
+            i2c_activate = true;
             i2c_master_get_bus_handle(I2C_NUM_0, &i2c_bus);
             i2c_device_config_t dev_cfg = {
                 .dev_addr_length = I2C_ADDR_BIT_LEN_7,

@@ -1,2 +1,2 @@
-idf_component_register(SRCS  "main.cpp" "ws2812b/ws2812b.c" "pca9955/pca9955.c"
-                    INCLUDE_DIRS "")
+idf_component_register(SRCS  "main.cpp" "src/channelhandle.cpp" "src/LedDriver.cpp" "src/pca9955.c" "src/pca9955driver.cpp" "src/ws2812.c" "src/ws2812driver.cpp"
+                    INCLUDE_DIRS "inc" " ")
